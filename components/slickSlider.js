@@ -1,5 +1,7 @@
 import React,{useRef,forwardRef, useEffect,useState} from 'react';
 import styles from './slickSlider.module.scss'
+import _ from "lodash"
+
 const Img = forwardRef(({styleImg},childSliderCardRef) =>{
     const imgArr = [
         {
@@ -85,6 +87,28 @@ const SlickSlider = () => {
     let divCardsContainerTotalWidth=0;
     // Detect if we reached end of the slides
     let endOfSlide = false
+    // Loadash throttler to throttle resize and if user clicks button many times 
+    // var throttle = _.throttle((func,...args)=> {
+    //     func(...args)
+    // }, 1000);
+    const throttler = (callBack,...args)=>{
+      console.log('lsfjljasf')
+      let wait = false; 
+      return ()=>{
+        console.log('lsfjljasf')
+        if (!wait){
+          return callBack(...args)
+          wait = true
+          setTimeout(()=>{
+            wait=false
+          },1000)
+        }
+      }  
+    }
+    const throttle = function(func,...args){
+        return throttler(func,...args)
+    }
+
     const resetSliderPosition = () =>{
         // default slidesToScrollWidth:240px
         nextPxValueToScrl = -slidesToScrollWidth; 
@@ -114,7 +138,7 @@ const SlickSlider = () => {
         }
     }
     const clickHandler = (direction)=>{ 
-        console.log('a')
+        
         // If next button is clicked
         if (direction === 'next'){
             // If reached end of slide return to first slide
@@ -167,7 +191,6 @@ const SlickSlider = () => {
         eachSlideMargin=Number(eachSlideMargin)*2 
         // Each slider card width is calculated by adding its own width with its own margin
         eachSlideWidth = childSliderCardRef.current.offsetWidth+eachSlideMargin;
-        console.log(eachSlideWidth)
         // eachSlideWidth =Number(eachSlideWidth)
         // Number of slides to scroll
         slidesToScroll = 1
@@ -188,18 +211,22 @@ const SlickSlider = () => {
         // Capture previous button by class name
         const prevBtn = document.getElementsByClassName('prev')[0]
         // Handle click event for both buttons
-        nextBtn.addEventListener('click',()=>clickHandler('next'))
-        prevBtn.addEventListener('click',()=>clickHandler('prev'))
+        nextBtn.addEventListener('click',throttle(clickHandler,'next'))
+        prevBtn.addEventListener('click',throttle(clickHandler,'prev'))
         window.addEventListener('resize',()=>{
-            initValues()
-            clickHandler('next')
-            clickHandler('prev')
-            
+            throttle(initValues)()
+            throttle(clickHandler,'next')()
+            throttle(clickHandler,'prev')()   
         })
         return ()=>{
-            // Execute when unmounting
-            nextBtn.removeEventListener('click',()=>clickHandler('next'))
-            prevBtn.removeEventListener('click',()=>clickHandler('prev'))
+            // Execute when unmounting (cleanup)
+            nextBtn.removeEventListener('click',throttle(clickHandler,'next'))
+            prevBtn.removeEventListener('click',throttle(clickHandler,'prev'))
+            window.removeEventListener('resize',()=>{
+                throttle(initValues)()
+                throttle(clickHandler,'next')()
+                throttle(clickHandler,'prev')()   
+            })
         }
     
     },[])

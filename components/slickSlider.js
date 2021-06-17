@@ -88,27 +88,9 @@ const SlickSlider = () => {
     // Detect if we reached end of the slides
     let endOfSlide = false
     // Loadash throttler to throttle resize and if user clicks button many times 
-    // var throttle = _.throttle((func,...args)=> {
-    //     func(...args)
-    // }, 1000);
-    const throttler = (callBack,...args)=>{
-      console.log('lsfjljasf')
-      let wait = false; 
-      return ()=>{
-        console.log('lsfjljasf')
-        if (!wait){
-          return callBack(...args)
-          wait = true
-          setTimeout(()=>{
-            wait=false
-          },1000)
-        }
-      }  
-    }
-    const throttle = function(func,...args){
-        return throttler(func,...args)
-    }
-
+    var throttle = _.throttle((func,...args)=> {
+        func(...args)
+    }, 1000);
     const resetSliderPosition = () =>{
         // default slidesToScrollWidth:240px
         nextPxValueToScrl = -slidesToScrollWidth; 
@@ -206,26 +188,29 @@ const SlickSlider = () => {
         // Execute when mounting
         // Initialize required values in particular function
         initValues()
+        setInterval(()=>{
+            clickHandler('next')
+        },2000)
         // Capture next button by class name
         const nextBtn  = document.getElementsByClassName('next')[0]
         // Capture previous button by class name
         const prevBtn = document.getElementsByClassName('prev')[0]
         // Handle click event for both buttons
-        nextBtn.addEventListener('click',throttle(clickHandler,'next'))
-        prevBtn.addEventListener('click',throttle(clickHandler,'prev'))
+        nextBtn.addEventListener('click',()=>throttle(clickHandler,'next'))
+        prevBtn.addEventListener('click',()=>throttle(clickHandler,'prev'))
         window.addEventListener('resize',()=>{
-            throttle(initValues)()
-            throttle(clickHandler,'next')()
-            throttle(clickHandler,'prev')()   
+            throttle(initValues)
+            throttle(clickHandler,'next')
+            throttle(clickHandler,'prev')   
         })
         return ()=>{
             // Execute when unmounting (cleanup)
-            nextBtn.removeEventListener('click',throttle(clickHandler,'next'))
-            prevBtn.removeEventListener('click',throttle(clickHandler,'prev'))
-            window.removeEventListener('resize',()=>{
-                throttle(initValues)()
-                throttle(clickHandler,'next')()
-                throttle(clickHandler,'prev')()   
+            nextBtn.removeEventListener('click',()=>throttle(clickHandler,'next'))
+            prevBtn.removeEventListener('click',()=>throttle(clickHandler,'prev'))
+            window.addEventListener('resize',()=>{
+                throttle(initValues)
+                throttle(clickHandler,'next')
+                throttle(clickHandler,'prev')   
             })
         }
     

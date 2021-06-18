@@ -66,6 +66,7 @@ const Img = forwardRef(({styleImg},childSliderCardRef) =>{
     )
 })
 const SlickSlider = () => {
+    let timerId;
     const styleImg = {
         width:'200px',
         height:'300px'
@@ -85,6 +86,7 @@ const SlickSlider = () => {
     let nextPxValueToScrl = 0; 
     let prevPxValueToScrl = 0;
     let divCardsContainerTotalWidth=0;
+
     // Detect if we reached end of the slides
     let endOfSlide = false
     // Loadash throttler to throttle resize and if user clicks button many times 
@@ -96,6 +98,10 @@ const SlickSlider = () => {
         nextPxValueToScrl = -slidesToScrollWidth; 
         prevPxValueToScrl = slidesToScrollWidth;
         divCardsContainer.current.style.cssText = `transform: translateX(-${0}px)`;
+    }
+    const displayArrow=(direction='prev',toDisplay=true)=>{
+        if  (!toDisplay)document.getElementsByClassName(direction)[0].style.display="none"
+        else document.getElementsByClassName(direction)[0].style.display="inline-block"
     }
     const updateSliderPositionRef = (updateref) =>{
         // translateX(0) -> initial position, starting position
@@ -123,6 +129,7 @@ const SlickSlider = () => {
         
         // If next button is clicked
         if (direction === 'next'){
+            displayArrow('prev',true)
             // If reached end of slide return to first slide
             if(endOfSlide){  
                 // Return to first slide and reset positions of scroll reference
@@ -148,10 +155,12 @@ const SlickSlider = () => {
             // End of slide cannot be reached by clicking previous button
             endOfSlide = false
             if(prevPxValueToScrl>0){
+                displayArrow('prev',false)
                 // If slider is over left return to first slide and reset positions of scroll reference
                 // ex: say by default reference prevPxValueToScrl is set to 240px hence this is executed
                 resetSliderPosition()
             }else{
+                displayArrow('prev',true)
                 // If everything is right translate to prev px value
                 divCardsContainer.current.style.cssText = `transform: translateX(${prevPxValueToScrl}px)`;
                 // Update slider position reference, pass 'prev' to update refrence with respect to next button click
@@ -183,14 +192,29 @@ const SlickSlider = () => {
         nextPxValueToScrl = -slidesToScrollWidth; // ex:-240px
         // Cards container width generally equal to eachsliderwidth*totalnumberofslides
         divCardsContainerTotalWidth = divCardsContainer.current.offsetWidth
+        displayArrow('prev',false)
     }
+    
+    const autoSliderMove=(timeout,autoplay)=>{
+        console.log("mouseleave")
+        if(autoplay){
+            timerId=setInterval(()=>{
+                throttle(clickHandler,'next')
+            },10000000000)
+        }
+    }
+    const clearAutoSliderMove=(timerId)=>{
+        console.log("mouseenter")
+        if(timerId){
+            clearTimeout(timerId)
+        }
+    }
+    // Useeffect for slider next and prev button
     useEffect(()=>{
         // Execute when mounting
         // Initialize required values in particular function
         initValues()
-        setInterval(()=>{
-            clickHandler('next')
-        },2000)
+        autoSliderMove(2000,true)
         // Capture next button by class name
         const nextBtn  = document.getElementsByClassName('next')[0]
         // Capture previous button by class name
@@ -198,6 +222,8 @@ const SlickSlider = () => {
         // Handle click event for both buttons
         nextBtn.addEventListener('click',()=>throttle(clickHandler,'next'))
         prevBtn.addEventListener('click',()=>throttle(clickHandler,'prev'))
+        slickSliderMainContainer.current.addEventListener('mouseenter',()=>clearAutoSliderMove(timerId))
+        slickSliderMainContainer.current.addEventListener('mouseleave',()=>autoSliderMove(1000,true) )
         window.addEventListener('resize',()=>{
             throttle(initValues)
             throttle(clickHandler,'next')
@@ -207,16 +233,47 @@ const SlickSlider = () => {
             // Execute when unmounting (cleanup)
             nextBtn.removeEventListener('click',()=>throttle(clickHandler,'next'))
             prevBtn.removeEventListener('click',()=>throttle(clickHandler,'prev'))
+            
+            slickSliderMainContainer.current.removeEventListener('mouseenter',()=>clearAutoSliderMove(timerId))
+            slickSliderMainContainer.current.removeEventListener('mouseleave',()=>autoSliderMove(1000,true) )
             window.addEventListener('resize',()=>{
                 throttle(initValues)
                 throttle(clickHandler,'next')
                 throttle(clickHandler,'prev')   
             })
         }
-    
+    },[])
+    let touchStartPos =0;
+    const touchStartHandler = (e)=>{
+        touchStartPos=e.changedTouches[0].clientX;
+        // console.log(e.changedTouches[0].clientX)   
+    }
+    const touchEndHandler=(e)=>{
+        let touchEndPos =    e.changedTouches[0].clientX;
+        if (touchEndPos===touchStartPos) return
+        if (touchEndPos-touchStartPos>0) clickHandler('prev')
+        else clickHandler('next')
+    }
+    const dragHandler = (e) =>{
+        e.preventDefault()
+    }
+    // useEffect for touch capability
+    useEffect(()=>{
+        let images = Array.from(document.getElementsByClassName('imageHolder'))
+        images.forEach((image)=>{image.addEventListener('dragstart',(e)=>dragHandler(e) )})
+        slickSliderMainContainer.current.addEventListener('touchstart',(e)=>touchStartHandler(e))
+        slickSliderMainContainer.current.addEventListener('touchend',(e)=>touchEndHandler(e) )
+        childSliderCardRef.current.removeEventListener('dragstart',(e)=>dragHandler(e) )
+        // slickSliderMainContainer.current.addEventListener('touchmove',(e)=>touchStartHandler(e) )
+        return ()=> {
+            slickSliderMainContainer.current.removeEventListener('touchstart',(e)=>touchStartHandler(e) )
+            slickSliderMainContainer.current.removeEventListener('touchend',(e)=>touchEndHandler(e))
+            // slickSliderMainContainer.current.removeEventListener('touchmove',(e)=>touchStartHandler(e))
+            // throttle(touchStartHandler,2000,e) 
+        }
     },[])
     return (
-        <div id="visibleDiv" ref={slickSliderMainContainer}  className={styles.Cslick}>
+        <div id="visibleDiv" ref={slickSliderMainContainer}  className={styles.Cslick + ' slickMainContainerDiv '}>
             <i  className={styles.button+' prev '}>Prev</i>
             
             <div ref={divCardsContainer} className={styles.slick+ ' imgComp '}>

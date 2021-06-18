@@ -68,7 +68,7 @@ const Img = forwardRef(({styleImg},childSliderCardRef) =>{
 const SlickSlider = () => {
     let timerId;
     const styleImg = {
-        width:'200px',
+        width:'10vw',
         height:'300px'
     };
     let [dummy,du] = useState();
@@ -200,7 +200,7 @@ const SlickSlider = () => {
         if(autoplay){
             timerId=setInterval(()=>{
                 throttle(clickHandler,'next')
-            },10000000000)
+            },1000)
         }
     }
     const clearAutoSliderMove=(timerId)=>{

@@ -2,8 +2,30 @@ import React,{useRef,forwardRef, useEffect,useState} from 'react';
 import styles from './slickSlider.module.scss'
 import _ from "lodash"
 
-const Img = forwardRef(({styleImg},childSliderCardRef) =>{
-    const imgArr = [
+const Img = forwardRef(({styleImg,imgArr},childSliderCardRef) =>{
+    
+    
+    useEffect(()=>{
+    let id = 11;
+ 
+
+    },[])
+    
+    // let imageSlide = useRef(null);
+    return (
+        <>
+            {imgArr.map((src,index)=>{
+                return (
+                    <div key={src.id}  ref={childSliderCardRef} style={styleImg}  className={styles.Img+' div div__sliderCard div__sliderCard--slideCalulate '}>
+                        <img key={src.id} loading='lazy' style={{width:'inherit',objectFit:'cover',height:'100%'}} src={src.src}   className={styles.sliderImg + ' imageHolder '}  alt="" />
+                    </div>
+                )
+            })}
+        </>
+    )
+})
+const SlickSlider = () => {
+    const imgArrData = [
         {
             'src':'static/s1.jpg',
             id:1,
@@ -43,32 +65,22 @@ const Img = forwardRef(({styleImg},childSliderCardRef) =>{
             'src':'static/s10.jpg',
             id:10,
         },
+        {
+            'src':'https://picsum.photos/200/300',
+            id:11,
+        },
+        {
+            'src':'https://picsum.photos/1200/2300',
+            id:12,
+        },
     
     ]
-    const [imgState,imgArrUpdt] = useState(imgArr)
-    useEffect(()=>{
-    let id = 11;
- 
-
-    },[])
-    
-    // let imageSlide = useRef(null);
-    return (
-        <>
-            {imgState.map((src,index)=>{
-                return (
-                    <div key={src.id}  ref={childSliderCardRef} style={styleImg}  className={styles.Img+' imageCont '}>
-                        <img loading='lazy' style={{width:'inherit',objectFit:'cover',height:'100%'}} src={src.src}  key={src.id} className={'imageHolder'}  alt="" />
-                    </div>
-                )
-            })}
-        </>
-    )
-})
-const SlickSlider = () => {
+    const [imgArr,imgArrUpdt] = useState(imgArrData)
+    let imageUpdateArr=imgArr;
+    let id = 12;
     let timerId;
     const styleImg = {
-        width:'10vw',
+        width:'200px',
         height:'300px'
     };
     let [dummy,du] = useState();
@@ -90,14 +102,20 @@ const SlickSlider = () => {
     // Detect if we reached end of the slides
     let endOfSlide = false
     // Loadash throttler to throttle resize and if user clicks button many times 
-    var throttle = _.throttle((func,...args)=> {
+    let throttle = _.throttle((func,...args)=> {
         func(...args)
-    }, 1000);
+    }, 500);
+    let debounce = _.debounce((func,...args)=> {
+        func(...args)
+        // console.log('deibounc')
+    }, 800);
     const resetSliderPosition = () =>{
         // default slidesToScrollWidth:240px
         nextPxValueToScrl = -slidesToScrollWidth; 
         prevPxValueToScrl = slidesToScrollWidth;
         divCardsContainer.current.style.cssText = `transform: translateX(-${0}px)`;
+        displayArrow('prev',false)
+        divCardsContainerTotalWidth = divCardsContainer.current.offsetWidth
     }
     const displayArrow=(direction='prev',toDisplay=true)=>{
         if  (!toDisplay)document.getElementsByClassName(direction)[0].style.display="none"
@@ -125,6 +143,25 @@ const SlickSlider = () => {
             // second-time:nextPxValueToScrl:240
         }
     }
+    const updateSliderArray = () =>{
+        const newElement = [
+            {
+                'src':'static/per1.jpg',
+                id:id,
+            },
+            {
+                'src':'static/per2.jpg',
+                id:id+1
+            }
+        ]
+        // imgArr.push(...newElement)
+        imageUpdateArr =  imageUpdateArr.concat(newElement)
+        imgArrUpdt(imageUpdateArr );
+        divCardsContainerTotalWidth = divCardsContainer.current.offsetWidth
+        id = id+2;
+        // // console.log(imgArrData)
+        // clickHandler('next')
+    }
     const clickHandler = (direction)=>{ 
         
         // If next button is clicked
@@ -144,6 +181,7 @@ const SlickSlider = () => {
                 // Update slider position reference, pass 'next' to update refrence with respect to next button click
                 updateSliderPositionRef('next')
                 endOfSlide = true
+                // updateSliderArray()
             }else{
                 // If everything is right translate to next px value
                 divCardsContainer.current.style.cssText = `transform: translateX(${nextPxValueToScrl}px)`
@@ -155,7 +193,7 @@ const SlickSlider = () => {
             // End of slide cannot be reached by clicking previous button
             endOfSlide = false
             if(prevPxValueToScrl>0){
-                displayArrow('prev',false)
+                // displayArrow('prev',false)
                 // If slider is over left return to first slide and reset positions of scroll reference
                 // ex: say by default reference prevPxValueToScrl is set to 240px hence this is executed
                 resetSliderPosition()
@@ -171,48 +209,72 @@ const SlickSlider = () => {
         }
     }
     const initValues =() =>{
+        endOfSlide = false
         // Slider width is an outer div which shows entire slider if we set slider to be 200px wide- 
         // -width is set on this div , we need it to calculate slider visible width in which slider is visible
         // by default slider takes full viewport width.ex : 1600px
         sliderVisibleWidth = slickSliderMainContainer.current.offsetWidth;
         // If slider has margin (space between slider cards if sliders are touch to each other then it has no margin)- 
         // -it is required to calculate how much does slider scrolls
-        let eachSlideMargin = window.getComputedStyle(childSliderCardRef.current).marginLeft.slice(0, -2);
+        let eachSlide = document.getElementsByClassName('div__sliderCard--slideCalulate')[0]
+        let eachSlideMargin = window.getComputedStyle(eachSlide).marginRight.slice(0, -2);
         // Convert from string to number and multiply it by two because margin is applied on both sides
-        eachSlideMargin=Number(eachSlideMargin)*2 
+        eachSlideMargin=Number(eachSlideMargin)*2
         // Each slider card width is calculated by adding its own width with its own margin
-        eachSlideWidth = childSliderCardRef.current.offsetWidth+eachSlideMargin;
+        eachSlideWidth = eachSlide.offsetWidth+eachSlideMargin;
         // eachSlideWidth =Number(eachSlideWidth)
         // Number of slides to scroll
         slidesToScroll = 1
         // Number of slides to scroll in pixels ex: if 240px
         slidesToScrollWidth=eachSlideWidth*slidesToScroll;
+        slidesToScrollWidth = sliderVisibleWidth;
         // to calculate and track progress of left and right scroll positions
         prevPxValueToScrl = slidesToScrollWidth; // ex:240px
         nextPxValueToScrl = -slidesToScrollWidth; // ex:-240px
-        // Cards container width generally equal to eachsliderwidth*totalnumberofslides
+        // Cards container width generally equal to eachsliderwidth*totalnumberofslides including margin ex: say 2090px
         divCardsContainerTotalWidth = divCardsContainer.current.offsetWidth
-        displayArrow('prev',false)
+        // displayArrow('prev',false)
     }
     
     const autoSliderMove=(timeout,autoplay)=>{
-        console.log("mouseleave")
+        // console.log("mouseleave")
         if(autoplay){
             timerId=setInterval(()=>{
                 throttle(clickHandler,'next')
-            },1000)
+            },100000000000000)
         }
     }
     const clearAutoSliderMove=(timerId)=>{
-        console.log("mouseenter")
+        // console.log("mouseenter")
         if(timerId){
             clearTimeout(timerId)
         }
     }
+    // useEffect for number of slides to show per div
+    function setStyle(className, styleValue) {
+        let items = document.getElementsByClassName(className);
+        for (var i=0; i < items.length; i++) {
+          items[i].style.margin = `0 ${styleValue/2}px 0 ${styleValue/2}px`
+          if (i+1===(items.length))items[i].style.marginRight = 'auto'
+        }
+    }
+    function calculateMargin(){
+        const minGapBetweenSlides = 10
+        const sliderVisibleWidth = slickSliderMainContainer.current.offsetWidth;
+        const eachSlideWidth = childSliderCardRef.current.offsetWidth+minGapBetweenSlides
+        const slidesPerVisibleWidth = sliderVisibleWidth/(eachSlideWidth);
+        const marginToSetInPercentage = slidesPerVisibleWidth - Math.floor(slidesPerVisibleWidth)
+        const marginToSetInPx = ((marginToSetInPercentage)*eachSlideWidth)
+        const marginPerSlide = (marginToSetInPx/(Math.ceil(slidesPerVisibleWidth)-1))+minGapBetweenSlides
+        setStyle('div__sliderCard--slideCalulate',Math.ceil(marginPerSlide))
+        console.log((marginPerSlide))
+    }
     // Useeffect for slider next and prev button
     useEffect(()=>{
+        console.log('Use ',childSliderCardRef)
         // Execute when mounting
         // Initialize required values in particular function
+        calculateMargin()
         initValues()
         autoSliderMove(2000,true)
         // Capture next button by class name
@@ -225,21 +287,24 @@ const SlickSlider = () => {
         slickSliderMainContainer.current.addEventListener('mouseenter',()=>clearAutoSliderMove(timerId))
         slickSliderMainContainer.current.addEventListener('mouseleave',()=>autoSliderMove(1000,true) )
         window.addEventListener('resize',()=>{
-            throttle(initValues)
-            throttle(clickHandler,'next')
-            throttle(clickHandler,'prev')   
+            debounce(()=>{
+                calculateMargin();
+                initValues();
+                resetSliderPosition();
+            });
         })
         return ()=>{
             // Execute when unmounting (cleanup)
             nextBtn.removeEventListener('click',()=>throttle(clickHandler,'next'))
-            prevBtn.removeEventListener('click',()=>throttle(clickHandler,'prev'))
-            
+            prevBtn.removeEventListener('click',()=>throttle(clickHandler,'prev'))       
             slickSliderMainContainer.current.removeEventListener('mouseenter',()=>clearAutoSliderMove(timerId))
             slickSliderMainContainer.current.removeEventListener('mouseleave',()=>autoSliderMove(1000,true) )
             window.addEventListener('resize',()=>{
-                throttle(initValues)
-                throttle(clickHandler,'next')
-                throttle(clickHandler,'prev')   
+                debounce(()=>{
+                    calculateMargin();
+                    initValues();
+                    resetSliderPosition();
+                });       
             })
         }
     },[])
@@ -249,7 +314,7 @@ const SlickSlider = () => {
         // console.log(e.changedTouches[0].clientX)   
     }
     const touchEndHandler=(e)=>{
-        let touchEndPos =    e.changedTouches[0].clientX;
+        let touchEndPos = e.changedTouches[0].clientX;
         if (touchEndPos===touchStartPos) return
         if (touchEndPos-touchStartPos>0) clickHandler('prev')
         else clickHandler('next')
@@ -257,17 +322,33 @@ const SlickSlider = () => {
     const dragHandler = (e) =>{
         e.preventDefault()
     }
+    const onImageLoad = (image,isImgReady) =>{
+        if (isImgReady){
+            image.classList.remove('loading')
+        }else{
+            image.classList.add('loading')
+        }
+        
+    }
     // useEffect for touch capability
     useEffect(()=>{
         let images = Array.from(document.getElementsByClassName('imageHolder'))
-        images.forEach((image)=>{image.addEventListener('dragstart',(e)=>dragHandler(e) )})
-        slickSliderMainContainer.current.addEventListener('touchstart',(e)=>touchStartHandler(e))
-        slickSliderMainContainer.current.addEventListener('touchend',(e)=>touchEndHandler(e) )
-        childSliderCardRef.current.removeEventListener('dragstart',(e)=>dragHandler(e) )
+        images.forEach((image)=>{
+            onImageLoad(image,false)
+            image.addEventListener('dragstart',(e)=>dragHandler(e) )
+            image.addEventListener('load',(e)=>onImageLoad(image,true))
+        })
+        slickSliderMainContainer.current.addEventListener('touchstart',(e)=>touchStartHandler(e),{passive:true})
+        slickSliderMainContainer.current.addEventListener('touchend',(e)=>touchEndHandler(e),{passive:true} )
+        // childSliderCardRef.current.removeEventListener('dragstart',(e)=>dragHandler(e) )
         // slickSliderMainContainer.current.addEventListener('touchmove',(e)=>touchStartHandler(e) )
         return ()=> {
             slickSliderMainContainer.current.removeEventListener('touchstart',(e)=>touchStartHandler(e) )
-            slickSliderMainContainer.current.removeEventListener('touchend',(e)=>touchEndHandler(e))
+            slickSliderMainContainer.current.removeEventListener('touchend',(e)=>touchEndHandler(e),{passive:true})
+            images.forEach((image)=>{
+                image.removeEventListener('dragstart',(e)=>dragHandler(e) )
+                image.removeEventListener('load',(e)=>onImageLoad(e))
+            })
             // slickSliderMainContainer.current.removeEventListener('touchmove',(e)=>touchStartHandler(e))
             // throttle(touchStartHandler,2000,e) 
         }
@@ -277,7 +358,7 @@ const SlickSlider = () => {
             <i  className={styles.button+' prev '}>Prev</i>
             
             <div ref={divCardsContainer} className={styles.slick+ ' imgComp '}>
-            <Img ref={childSliderCardRef} styleImg={styleImg} />
+            <Img ref={childSliderCardRef} imgArr={imgArr} styleImg={styleImg} />
             </div>
            <i  className={styles.button+' next '}>Next</i>
         </div>

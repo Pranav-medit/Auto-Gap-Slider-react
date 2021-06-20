@@ -21,6 +21,11 @@ const Slider = () => {
                 .slider{
                     margin-right:0px;
                 }
+                .loading{
+                    background-image:url('/icons/loading.svg');
+                    background-repeat: no-repeat;
+                    background-position:center;
+                }
             `}
             </style>
         </div>

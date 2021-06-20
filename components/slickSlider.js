@@ -292,7 +292,7 @@ const SlickSlider = () => {
                 initValues();
                 resetSliderPosition();
             });
-        })
+        });
         return ()=>{
             // Execute when unmounting (cleanup)
             nextBtn.removeEventListener('click',()=>throttle(clickHandler,'next'))

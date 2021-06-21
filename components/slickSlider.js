@@ -1,5 +1,6 @@
 import React,{useRef,forwardRef, useEffect,useState} from 'react';
 import styles from './slickSlider.module.scss'
+import './slickSlider.module.css'
 import _ from "lodash"
 
 const Img = forwardRef(({styleImg,imgArr},childSliderCardRef) =>{
@@ -17,7 +18,7 @@ const Img = forwardRef(({styleImg,imgArr},childSliderCardRef) =>{
             {imgArr.map((src,index)=>{
                 return (
                     <div key={src.id}  ref={childSliderCardRef} style={styleImg}  className={styles.Img+' div div__sliderCard div__sliderCard--slideCalulate '}>
-                        <img key={src.id} loading='lazy' style={{width:'inherit',objectFit:'cover',height:'100%'}} src={src.src}   className={styles.sliderImg + ' imageHolder '}  alt="" />
+                        <img key={src.id} loading='lazy' style={{}} src={src.src}   className={styles.sliderImg + ' imageHolder '}  alt="" />
                     </div>
                 )
             })}
@@ -79,9 +80,11 @@ const SlickSlider = () => {
     let imageUpdateArr=imgArr;
     let id = 12;
     let timerId;
+    const [cardMargin,updateCardMargin] = useState(0);
     const styleImg = {
         width:'200px',
-        height:'300px'
+        height:'300px',
+        margin:`0 ${cardMargin/2}px 0 ${cardMargin/2}px`
     };
     let [dummy,du] = useState();
     // Each slider card
@@ -118,8 +121,13 @@ const SlickSlider = () => {
         divCardsContainerTotalWidth = divCardsContainer.current.offsetWidth
     }
     const displayArrow=(direction='prev',toDisplay=true)=>{
-        if  (!toDisplay)document.getElementsByClassName(direction)[0].style.display="none"
-        else document.getElementsByClassName(direction)[0].style.display="inline-block"
+        if (direction==='prev'){
+            if  (!toDisplay)showLeftArrow(false)
+            else showLeftArrow(true)
+        }else{
+            if  (!toDisplay)showRightArrow(false)
+            else showRightArrow(true)
+        }
     }
     const updateSliderPositionRef = (updateref) =>{
         // translateX(0) -> initial position, starting position
@@ -163,7 +171,7 @@ const SlickSlider = () => {
         // clickHandler('next')
     }
     const clickHandler = (direction)=>{ 
-        
+        debugger
         // If next button is clicked
         if (direction === 'next'){
             displayArrow('prev',true)
@@ -193,7 +201,7 @@ const SlickSlider = () => {
             // End of slide cannot be reached by clicking previous button
             endOfSlide = false
             if(prevPxValueToScrl>0){
-                // displayArrow('prev',false)
+                displayArrow('prev',false)
                 // If slider is over left return to first slide and reset positions of scroll reference
                 // ex: say by default reference prevPxValueToScrl is set to 240px hence this is executed
                 resetSliderPosition()
@@ -207,6 +215,7 @@ const SlickSlider = () => {
             
             
         }
+        debugger
     }
     const initValues =() =>{
         endOfSlide = false
@@ -233,7 +242,7 @@ const SlickSlider = () => {
         nextPxValueToScrl = -slidesToScrollWidth; // ex:-240px
         // Cards container width generally equal to eachsliderwidth*totalnumberofslides including margin ex: say 2090px
         divCardsContainerTotalWidth = divCardsContainer.current.offsetWidth
-        // displayArrow('prev',false)
+        displayArrow('prev',false)
     }
     
     const autoSliderMove=(timeout,autoplay)=>{
@@ -253,8 +262,9 @@ const SlickSlider = () => {
     // useEffect for number of slides to show per div
     function setStyle(className, styleValue) {
         let items = document.getElementsByClassName(className);
+        updateCardMargin(styleValue);
         for (var i=0; i < items.length; i++) {
-          items[i].style.margin = `0 ${styleValue/2}px 0 ${styleValue/2}px`
+         
           if (i+1===(items.length))items[i].style.marginRight = 'auto'
         }
     }
@@ -353,15 +363,22 @@ const SlickSlider = () => {
             // throttle(touchStartHandler,2000,e) 
         }
     },[])
+    const [leftArrowDisplay,showLeftArrow]= useState(true);
+    const [rightArrowDisplay,showRightArrow]= useState(true);
+    const leftStyle = {display:leftArrowDisplay?"inline-block":"none"}
+    const rightStyle = {display:rightArrowDisplay?"inline-block":"none"}
     return (
+        <>
         <div id="visibleDiv" ref={slickSliderMainContainer}  className={styles.Cslick + ' slickMainContainerDiv '}>
-            <i  className={styles.button+' prev '}>Prev</i>
+            <i style={leftStyle}  className={styles.button+' prev '}>Prev</i>
             
             <div ref={divCardsContainer} className={styles.slick+ ' imgComp '}>
             <Img ref={childSliderCardRef} imgArr={imgArr} styleImg={styleImg} />
             </div>
            <i  className={styles.button+' next '}>Next</i>
         </div>
+        <p style={rightStyle} id={styles['idea']} >hey</p>
+        </>
     );
 };
 

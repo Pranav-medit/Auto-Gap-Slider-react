@@ -1,7 +1,7 @@
 // :global body{
 //     margin:0;
 // }
-.autoGap{
+.divCardsContainer{
    
    margin: 0;
    display:flex;
@@ -10,7 +10,7 @@
    transition: transform ease-in-out .5s;
    
 }
-.CautoGap{
+.autoGapSliderMainContainer{
     // justify-content: center;
     position:relative;
     overflow:hidden;
@@ -78,13 +78,13 @@ i.button~.button{
     //     transform: translateX(+44px);
     // }
 }
-.Img{
+.sliderCard{
     // height: 400px !important;;
     display:block;
     margin: 0 40px 0 0;
     border-radius:8px;
 }
-.Img img{
+.sliderCard img{
     border-radius: inherit;
     user-select: none;
     width:inherit;
@@ -92,10 +92,10 @@ i.button~.button{
     height:100%
     
 }
-.Img:first-child{
+.sliderCard:first-child{
     margin-left: 0;
 }
-.Img:last-child{
+.sliderCard:last-child{
     // margin-right: 80px!important;
 }
 @keyframes goLeft{

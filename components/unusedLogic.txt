@@ -1,0 +1,67 @@
+// setTimeout(()=>{
+    //     id=id+2;
+    //     imgArrUpdt([...imgState,   {
+    //         'src':'static/per1.jpg',
+    //         id:id,
+    //     },
+    //     {
+    //         'src':'static/per2.jpg',
+    //         id:id+1,
+    //     }])
+    //     console.log(id)
+        
+    // },10000)
+// else if(left> -slidesToScrollWidth){
+//     divCardsContainer.current.style.cssText = `transform: translateX(-${0}px)`;
+//     nextPxValueToScrl = -slidesToScrollWidth; 
+//     prevPxValueToScrl = slidesToScrollWidth;
+// }
+// const clickHandler = (direction)=>{ 
+//     const left = divCardsContainer.current.getBoundingClientRect().left
+//     console.log(nextPxValueToScrl,-divCardsContainer.current.offsetWidth+sliderVisibleWidth)
+//     if (direction === 'next'){
+        
+//         if(nextPxValueToScrl,-divCardsContainer.current.offsetWidth+sliderVisibleWidth){
+//             divCardsContainer.current.style.cssText = `transform: translateX(-${0}px)`;
+//             nextPxValueToScrl = -slidesToScrollWidth; 
+//             prevPxValueToScrl = slidesToScrollWidth;
+//         }else if (divCardsContainer.current.offsetWidth-sliderVisibleWidth< -nextPxValueToScrl) {
+//             divCardsContainer.current.style.cssText = `transform: translateX(${-divCardsContainer.current.offsetWidth+sliderVisibleWidth}px)`
+//             nextPxValueToScrl = -divCardsContainer.current.offsetWidth+sliderVisibleWidth
+//         }else{
+            
+//             divCardsContainer.current.style.cssText = `transform: translateX(${nextPxValueToScrl}px)`
+//             divCardsContainer.current.scrollLeft = slidesToScrollWidth;
+//             prevPxValueToScrl = prevPxValueToScrl-slidesToScrollWidth;
+//             nextPxValueToScrl = nextPxValueToScrl-slidesToScrollWidth;
+//         }
+        
+//     }else if(direction === 'prev'){
+//         console.log(prevPxValueToScrl)
+//         const left = divCardsContainer.current.getBoundingClientRect().left;
+//         if(prevPxValueToScrl>0){
+//             divCardsContainer.current.style.cssText = `transform: translateX(-${0}px)`;
+//             nextPxValueToScrl = -slidesToScrollWidth; 
+//             prevPxValueToScrl = slidesToScrollWidth;
+//         }else{
+//             divCardsContainer.current.style.cssText = `transform: translateX(${prevPxValueToScrl}px)`;
+//             nextPxValueToScrl =nextPxValueToScrl +slidesToScrollWidth;
+//             prevPxValueToScrl = prevPxValueToScrl+slidesToScrollWidth;
+//         }
+        
+//     }
+// // }
+// const left = divCardsContainer.current.getBoundingClientRect().left;
+// divCardsContainer.current.scrollLeft = slidesToScrollWidth;
+
+// let items = document.getElementsByClassName(className);
+// for (var i=0; i < items.length; i++) {
+//   if (i+1===(items.length))items[i].style.marginRight = 'auto'
+// }
+
+// initValues()
+// async function  setStyle(className, styleValue) {
+//     await updateSlideCardMargin(styleValue);
+
+//     initValues()
+// }

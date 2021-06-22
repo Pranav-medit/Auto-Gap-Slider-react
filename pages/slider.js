@@ -1,11 +1,11 @@
 import React from 'react';
-import SlickSlider from '../components/slickSlider'
+import AutoGapSlider from '../components/autoGapSlider'
 
 const Slider = () => {
     
     return (
         <div className='slider'>
-            <SlickSlider/>
+            <AutoGapSlider/>
             <style global jsx>
             {`
                 body {

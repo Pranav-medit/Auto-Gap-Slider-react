@@ -27,6 +27,7 @@ const Slider = () => {
                     background-size: cover;
                     background-position:center;
                 }
+                
             `}
             </style>
         </div>

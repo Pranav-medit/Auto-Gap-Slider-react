@@ -152,7 +152,7 @@ const AutoGapSlider = () => {
     // Loadash throttler to throttle resize and if user clicks button many times 
     let throttle = _.throttle((func,...args)=> {
         func(...args)
-    }, 500);
+    }, 600);
     let debounce = _.debounce((func,...args)=> {
         func(...args)
         // console.log('deibounc')
@@ -220,6 +220,7 @@ const AutoGapSlider = () => {
         // divCardsContainerTotalWidth = divCardsContainer.current.offsetWidth
         if (direction === 'next'){
             displayArrow('prev',true)
+            
             // If reached end of slide return to first slide
             if(endOfSlide){  
                 // Return to first slide and reset positions of scroll reference
@@ -228,7 +229,7 @@ const AutoGapSlider = () => {
                 // ex: say divCardsContainerTotalWidth = 2360; and sliderVisibleWidth = 1336 and nextPxValueToScrl = -1440 then
                 // sliderVisibleWidth is slider width which is visible to user
                 // divCardsContainerTotalWidth is total width of container holding cards =  visible area+hidden area
-            }else if ((divCardsContainerTotalWidth-sliderVisibleWidth-slideMargin)<= -nextPxValueToScrl) {
+            }else if ((divCardsContainerTotalWidth-sliderVisibleWidth-slideMargin-10)<= -nextPxValueToScrl) {
                 // If slide is about to reach last slide , last but one click of endofslide
                 divCardsContainer.current.style.cssText = `transform: translateX(${-divCardsContainerTotalWidth+sliderVisibleWidth}px)`
                 // Update slider position reference, pass 'next' to update refrence with respect to next button click
